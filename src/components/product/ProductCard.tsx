@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { formatCurrency } from '../../utils/formatCurrency';
 
 interface ProductCardProps {
@@ -14,7 +14,6 @@ interface ProductCardProps {
   reviewCount: number;
   deliveryDays: number;
   category?: string;
-  hasOptions?: boolean;
 }
 
 const Card = styled.div`
@@ -319,8 +318,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   rating,
   reviewCount,
   deliveryDays,
-  category,
-  hasOptions = false
+  category
 }) => {
   const [optionsOpen, setOptionsOpen] = useState(false);
   const navigate = useNavigate();

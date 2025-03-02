@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import AdminLayout from '../../components/admin/AdminLayout';
-import { FlexBox, Text, Button } from '../../styles/GlobalComponents';
+import { Text, Button } from '../../styles/GlobalComponents';
 import { formatCurrency } from '../../utils/formatCurrency';
 
 const PageContainer = styled.div`

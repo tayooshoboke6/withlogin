@@ -180,7 +180,6 @@ const CategorySection: React.FC = () => {
   // Touch swipe functionality
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
-  const [isSwiping, setIsSwiping] = useState(false);
   const trackRef = useRef<HTMLDivElement>(null);
   
   // In the future, this will fetch categories from the API
@@ -222,7 +221,6 @@ const CategorySection: React.FC = () => {
   // Touch handlers for swipe functionality
   const onTouchStart = (e: TouchEvent) => {
     setTouchStart(e.targetTouches[0].clientX);
-    setIsSwiping(true);
   };
   
   const onTouchMove = (e: TouchEvent) => {
@@ -231,8 +229,6 @@ const CategorySection: React.FC = () => {
   };
   
   const onTouchEnd = () => {
-    setIsSwiping(false);
-    
     if (!touchStart || !touchEnd) return;
     
     const distance = touchStart - touchEnd;

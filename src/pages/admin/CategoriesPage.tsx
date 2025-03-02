@@ -559,13 +559,6 @@ const CategoriesPage: React.FC = () => {
     category.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Get category color
-  const getCategoryColor = (categoryId: number | null): string => {
-    if (!categoryId) return '';
-    const category = MOCK_CATEGORIES.find(c => c.id === categoryId);
-    return category?.color || '';
-  };
-  
   return (
     <AdminLayout title="Categories">
       <Container>

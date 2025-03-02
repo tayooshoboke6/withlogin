@@ -1,4 +1,4 @@
-import React, { useState, useRef, TouchEvent } from 'react';
+import React, { useState, TouchEvent } from 'react';
 import styled from 'styled-components';
 
 const GalleryContainer = styled.div`

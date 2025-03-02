@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import styled from 'styled-components';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
-import { FlexBox, Text, Button } from '../styles/GlobalComponents';
+import { Text, Button } from '../styles/GlobalComponents';
 import { formatCurrency } from '../utils/formatCurrency';
 
 // Mock Categories with new hierarchy

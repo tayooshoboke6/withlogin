@@ -1,11 +1,273 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import type { TouchEvent as ReactTouchEvent } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
-import { FlexBox, Text, Button } from '../styles/GlobalComponents';
+import { Text, Button } from '../styles/GlobalComponents';
 import { useCart } from '../contexts/CartContext';
 import { formatCurrency } from '../utils/formatCurrency';
+
+// Styled Components
+const PageContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+`;
+
+const MainContent = styled.main`
+  flex: 1;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+`;
+
+const SectionContainer = styled.section`
+  margin-bottom: 40px;
+`;
+
+const BreadcrumbNavigation = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+`;
+
+const Breadcrumb = styled(Link)`
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 14px;
+  
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
+const BreadcrumbSeparator = styled.span`
+  margin: 0 8px;
+  color: var(--text-secondary);
+`;
+
+const BreadcrumbCurrent = styled.span`
+  color: var(--text-primary);
+  font-size: 14px;
+`;
+
+const ProductGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 30px;
+  
+  @media (min-width: 768px) {
+    grid-template-columns: 1fr 1fr;
+  }
+`;
+
+const ProductImages = styled.div`
+  position: relative;
+`;
+
+const ProductInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+`;
+
+const Rating = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 4px;
+`;
+
+const ReviewCount = styled.span`
+  margin-left: 8px;
+  color: var(--text-secondary);
+  font-size: 14px;
+`;
+
+const PriceContainer = styled.div`
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+`;
+
+const Spacer = styled.div<{ size: number }>`
+  height: ${props => props.size}px;
+`;
+
+const QuantitySelector = styled.div`
+  display: flex;
+  align-items: center;
+  margin-top: 8px;
+`;
+
+const QuantityButton = styled.button`
+  width: 36px;
+  height: 36px;
+  background: var(--background-light);
+  border: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  cursor: pointer;
+  
+  &:hover {
+    background: var(--background-hover);
+  }
+`;
+
+const QuantityValue = styled.span`
+  width: 50px;
+  text-align: center;
+  font-size: 16px;
+`;
+
+const AddToCartContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+  
+  @media (min-width: 568px) {
+    flex-direction: row;
+  }
+`;
+
+const SimilarProductsSection = styled.div`
+  margin-top: 40px;
+`;
+
+const ProductsCarousel = styled.div`
+  position: relative;
+  margin-top: 20px;
+`;
+
+const ProductsTrack = styled.div`
+  display: flex;
+  gap: 16px;
+  overflow-x: hidden;
+  transition: transform 0.3s ease;
+`;
+
+const ProductSlideCard = styled.div`
+  flex: 0 0 calc(33.333% - 16px);
+  max-width: calc(33.333% - 16px);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+  
+  @media (max-width: 768px) {
+    flex: 0 0 calc(50% - 16px);
+    max-width: calc(50% - 16px);
+  }
+  
+  @media (max-width: 576px) {
+    flex: 0 0 calc(100% - 16px);
+    max-width: calc(100% - 16px);
+  }
+`;
+
+const CardContent = styled.div`
+  padding: 12px;
+`;
+
+const CardTitle = styled.h3`
+  font-size: 14px;
+  margin: 0 0 8px;
+  font-weight: 500;
+`;
+
+const CardPrice = styled.div`
+  font-weight: bold;
+  color: var(--primary-color);
+`;
+
+const CardImage = styled.div`
+  overflow: hidden;
+  border-radius: 8px 8px 0 0;
+`;
+
+const ProductCard = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+`;
+
+const NavButton = styled.button<{ direction?: 'left' | 'right' }>`
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: white;
+  border: 1px solid var(--border-color);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  
+  &:hover {
+    background: var(--background-hover);
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  ${props => props.direction === 'left' ? 'left: 0;' : ''}
+  ${props => props.direction === 'right' ? 'right: 0;' : ''}
+`;
+
+// Import ProductImageGallery component or define it here if it doesn't exist
+const ProductImageGallery = ({ images, altText, onImageChange }: { 
+  images: string[], 
+  altText: string,
+  onImageChange: (index: number) => void 
+}) => {
+  const [activeIndex, setActiveIndex] = useState(0);
+  
+  useEffect(() => {
+    if (onImageChange) {
+      onImageChange(activeIndex);
+    }
+  }, [activeIndex, onImageChange]);
+  
+  return (
+    <div>
+      <div style={{ marginBottom: '10px' }}>
+        <img 
+          src={images[activeIndex] || 'https://via.placeholder.com/500x500?text=No+Image'} 
+          alt={altText} 
+          style={{ width: '100%', borderRadius: '8px', objectFit: 'cover' }}
+        />
+      </div>
+      <div style={{ display: 'flex', gap: '10px', overflowX: 'auto' }}>
+        {images.map((img, idx) => (
+          <img 
+            key={idx}
+            src={img} 
+            alt={`${altText} thumbnail ${idx + 1}`}
+            style={{ 
+              width: '80px', 
+              height: '80px', 
+              objectFit: 'cover',
+              cursor: 'pointer',
+              borderRadius: '4px',
+              border: idx === activeIndex ? '2px solid var(--primary-color)' : '2px solid transparent'
+            }}
+            onClick={() => setActiveIndex(idx)}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
 
 // Mock data for products with grocery store categories
 const mockProducts = [
@@ -244,7 +506,7 @@ const mockProducts = [
     category: 'Baby Food & Diapers',
     price: 6500,
     compareAtPrice: 7200,
-    description: 'Premium quality diapers for babies, sizes 3-5. Ultra-absorbent with up to 12 hours of protection. Gentle on baby's skin with hypoallergenic materials.',
+    description: 'Premium quality diapers for babies, sizes 3-5. Ultra-absorbent with up to 12 hours of protection. Gentle on baby\'s skin with hypoallergenic materials.',
     stock: 18,
     expiry: null,
     features: [
@@ -291,43 +553,14 @@ const mockProducts = [
   }
 ];
 
-// Interface for product data
-interface Product {
-  id: number;
-  name: string;
-  images: string[];
-  category: string;
-  price: number;
-  compareAtPrice?: number;
-  description: string;
-  stock: number;
-  expiry: string | null;
-  features: string[];
-  specs: {
-    [key: string]: string;
-  };
-  rating: number;
-  reviewCount: number;
-}
-
-// Interface for cart item
-interface CartItem {
-  id: number;
-  name: string;
-  image: string;
-  price: number;
-  quantity: number;
-}
-
 const ProductDetailPage = () => {
   const { id } = useParams();
   const { addToCart, buyNow, cartItems, updateQuantity, removeFromCart } = useCart();
   const navigate = useNavigate();
-  const [selectedImage, setSelectedImage] = useState(0);
+  const [_, setSelectedImage] = useState(0);
   const [currentSimilarIndex, setCurrentSimilarIndex] = useState(0);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
-  const trackRef = useRef<HTMLDivElement>(null);
 
   // Find if product is already in cart
   const cartItem = cartItems.find(item => item.id.toString() === id);
@@ -353,11 +586,11 @@ const ProductDetailPage = () => {
   };
 
   // Touch handlers for swipe functionality
-  const onTouchStart = (e: TouchEvent) => {
+  const onTouchStart = (e: ReactTouchEvent<HTMLDivElement>) => {
     setTouchStart(e.targetTouches[0].clientX);
   };
 
-  const onTouchMove = (e: TouchEvent) => {
+  const onTouchMove = (e: ReactTouchEvent<HTMLDivElement>) => {
     if (!touchStart) return;
     setTouchEnd(e.targetTouches[0].clientX);
   };
@@ -464,7 +697,7 @@ const ProductDetailPage = () => {
     if (halfStar) {
       stars.push(
         <svg key="star-half" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#FFD700" viewBox="0 0 16 16">
-          <path d="M5.354 5.119 7.538.792A.516.516 0 0 1 8 .5c.183 0 .366.097.465.292l2.184 4.327 4.898.696A.537.537 0 0 1 16 6.32a.548.548 0 0 1-.17.445l-3.523 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256a.52.52 0 0 1-.146.05c-.342.06-.668-.254-.6-.642l.83-4.73L.173 6.765a.55.55 0 0 1-.172-.403.58.58 0 0 1 .085-.302.513.513 0 0 1 .37-.245l4.898-.696zM8 12.027a.5.5 0 0 1 .232.056l3.686 1.894-.694-3.957a.565.565 0 0 1 .162-.505l2.907-2.77-4.052-.576a.525.525 0 0 1-.393-.288L8.001 2.223 8 2.226v9.8z"/>
+          <path d="M5.354 5.119 7.538.792A.516.516 0 0 1 8 .5c.183 0 .366.097.465.292l2.184 4.327 4.898.696A.537.537 0 0 1 16 6.32a.548.548 0 0 1-.17.445l-3.523 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256a.52.52 0 0 1-.146.05c-.342.06-.668-.254-.6-.642l.83-4.73L.173 6.765a.55.55 0 0 1-.172-.403.58.58 0 0 1 .085-.302.513.513 0 0 1 .37-.245l4.898-.696zM8 12.027a.5.5 0 0 1 .232.056l3.686 1.894-.694-3.957a.565.565 0 0 1 .162-.505l2.907-2.77-4.052-.575a.525.525 0 0 1-.393-.288L8.001 2.226 8 2.226v9.8z"/>
         </svg>
       );
     }
@@ -592,7 +825,6 @@ const ProductDetailPage = () => {
                 </NavButton>
 
                 <ProductsTrack 
-                  ref={trackRef}
                   style={{ transform: `translateX(-${currentSimilarIndex * 25}%)` }}
                   onTouchStart={onTouchStart}
                   onTouchMove={onTouchMove}

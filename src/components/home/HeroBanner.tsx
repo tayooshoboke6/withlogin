@@ -147,7 +147,7 @@ const banners = [
 ];
 
 const HeroBanner: React.FC = () => {
-  const [currentBanner, setCurrentBanner] = React.useState(0);
+  const [_, setCurrentBanner] = React.useState(0);
   
   const handleSlideChange = (index: number) => {
     setCurrentBanner(index);

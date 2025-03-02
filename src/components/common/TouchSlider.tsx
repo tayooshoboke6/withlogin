@@ -96,7 +96,7 @@ const TouchSlider: React.FC<TouchSliderProps> = ({
   
   // Auto-rotate slides
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: number;
     
     if (autoRotate && !isSwiping && slideCount > 1) {
       interval = setInterval(() => {
@@ -188,7 +188,7 @@ const TouchSlider: React.FC<TouchSliderProps> = ({
         style={{ transform: `translateX(${translateX}%)` }}
         transition={isSwiping ? 'none' : 'transform 0.4s ease-in-out'}
       >
-        {React.Children.map(children, (child, index) => (
+        {React.Children.map(children, (child) => (
           <div style={{ minWidth: '100%', width: '100%', flexShrink: 0 }}>
             {child}
           </div>

@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
-import { Button, FlexBox, SectionContainer, Spacer, Text } from '../styles/GlobalComponents';
+import { Button, SectionContainer, Spacer, Text } from '../styles/GlobalComponents';
 import { useCart } from '../contexts/CartContext';
 import { formatCurrency } from '../utils/formatCurrency';
 
@@ -244,45 +244,27 @@ const SummaryTitle = styled.h2`
 const SummaryRow = styled.div`
   display: flex;
   justify-content: space-between;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
   
-  &:last-of-type {
-    margin-bottom: 20px;
+  &:last-child {
+    margin-bottom: 0;
   }
 `;
 
-const TotalRow = styled(SummaryRow)`
-  border-top: 1px solid var(--med-gray);
-  padding-top: 15px;
-  margin-top: 15px;
-  font-weight: bold;
-  font-size: 1.1rem;
-`;
+interface TotalRowProps {
+  final?: boolean;
+}
 
-const PromoCodeInput = styled.div`
+const TotalRow = styled.div<TotalRowProps>`
   display: flex;
-  margin-bottom: 20px;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: ${props => props.final ? 'none' : '1px solid var(--light-gray)'};
   
-  input {
-    flex: 1;
-    padding: 8px 12px;
-    border: 1px solid var(--med-gray);
-    border-radius: 4px 0 0 4px;
-    font-size: 0.9rem;
-  }
-  
-  button {
-    padding: 8px 15px;
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    border-radius: 0 4px 4px 0;
-    cursor: pointer;
-    font-size: 0.9rem;
-    
-    &:hover {
-      background-color: #0056a4;
-    }
+  &.grand-total {
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-top: 10px;
   }
 `;
 
@@ -368,7 +350,6 @@ const AddItemPrompt = styled.div`
 
 const CartPage = () => {
   const { cartItems, updateQuantity, removeFromCart, getCartTotal } = useCart();
-  const [promoCode, setPromoCode] = useState('');
   const [deliveryOption, setDeliveryOption] = useState('home');
   
   // Calculate cart totals
@@ -466,7 +447,7 @@ const CartPage = () => {
                 
                 <AddItemPrompt>
                   <p>Add product worth at least {formatCurrency(50000)} and get free shipping</p>
-                  <Button variant="outline" as={Link} to="/" size="sm">
+                  <Button variant="outline" as={Link} to="/" size="small">
                     Continue Shopping
                   </Button>
                 </AddItemPrompt>
