@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
 import { Text, Button } from '../styles/GlobalComponents';
 import { formatCurrency } from '../utils/formatCurrency';
+import { useCart } from '../contexts/CartContext';
 
 // Mock Categories with new hierarchy
 const MOCK_CATEGORIES = [
@@ -622,11 +623,44 @@ const Breadcrumbs = styled.div`
   }
 `;
 
+interface Product {
+  id: number;
+  name: string;
+  price: number;
+  image: string;
+  stock: number;
+  category: string;
+  description: string;
+  expiry: string | null;
+  createdAt: string;
+}
+
 const CategoryProductsPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
-  const [products, setProducts] = useState<any[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [category, setCategory] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const { addToCart } = useCart();
+  
+  const handleProductClick = (productId: number) => {
+    navigate(`/product/${productId}`);
+  };
+  
+  const handleAddToCart = (e: React.MouseEvent<HTMLButtonElement>, product: Product) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (product.stock > 0) {
+      addToCart({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        image: product.image,
+        quantity: 1
+      });
+    }
+  };
   
   useEffect(() => {
     // Simulating an API call to fetch category and related products
@@ -755,7 +789,7 @@ const CategoryProductsPage: React.FC = () => {
           <ProductsGrid>
             {products.map(product => (
               <ProductCard key={product.id}>
-                <Link to={`/product/${product.id}`} style={{ textDecoration: 'none' }}>
+                <div onClick={() => handleProductClick(product.id)} style={{ cursor: 'pointer' }}>
                   <ProductImage>
                     <img src={product.image} alt={product.name} />
                   </ProductImage>
@@ -765,11 +799,15 @@ const CategoryProductsPage: React.FC = () => {
                     <ProductStock inStock={product.stock > 0}>
                       {product.stock > 0 ? `In Stock (${product.stock})` : 'Out of Stock'}
                     </ProductStock>
-                    <Button variant="primary" fullWidth>
+                    <Button 
+                      variant="primary" 
+                      fullWidth 
+                      onClick={(e) => handleAddToCart(e, product)}
+                    >
                       {product.stock > 0 ? 'Add to Cart' : 'Notify Me'}
                     </Button>
                   </ProductInfo>
-                </Link>
+                </div>
               </ProductCard>
             ))}
           </ProductsGrid>
