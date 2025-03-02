@@ -18,8 +18,8 @@ interface AuthContextType {
   isLoading: boolean;
   error: string | null;
   login: (email: string, password: string) => Promise<void>;
-  loginWithGoogle: () => Promise<void>;
-  loginWithApple: () => Promise<void>;
+  loginWithGoogle: () => Promise<User | null>;
+  loginWithApple: () => Promise<User | null>;
   register: (userData: RegisterData) => Promise<void>;
   logout: () => void;
   clearError: () => void;
@@ -126,14 +126,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const loginWithGoogle = async () => {
     setIsLoading(true);
     setError(null);
-    
     try {
-      // TODO: Implement Google authentication
-      // This will be integrated with backend once ready
-      console.log('Google login not implemented yet');
-      setError('Google login will be available once the backend is ready');
-    } catch (err: any) {
-      setError(err.message || 'Failed to login with Google');
+      // This will be implemented when integrating with the backend
+      // For now, we'll simulate a successful login
+      const mockUser = {
+        id: '123',
+        email: 'user@example.com',
+        firstName: 'John',
+        lastName: 'Doe',
+        token: 'mock-google-token',
+      };
+      
+      // Store the user data and token
+      setUser(mockUser);
+      localStorage.setItem('user', JSON.stringify(mockUser));
+      localStorage.setItem('token', mockUser.token);
+      
+      return mockUser;
+    } catch (error) {
+      setError('Google login failed. Please try again.');
+      console.error('Google login error:', error);
+      return null;
     } finally {
       setIsLoading(false);
     }
@@ -143,14 +156,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const loginWithApple = async () => {
     setIsLoading(true);
     setError(null);
-    
     try {
-      // TODO: Implement Apple authentication
-      // This will be integrated with backend once ready
-      console.log('Apple login not implemented yet');
-      setError('Apple login will be available once the backend is ready');
-    } catch (err: any) {
-      setError(err.message || 'Failed to login with Apple');
+      // This will be implemented when integrating with the backend
+      // For now, we'll simulate a successful login
+      const mockUser = {
+        id: '456',
+        email: 'user@example.com',
+        firstName: 'Jane',
+        lastName: 'Smith',
+        token: 'mock-apple-token',
+      };
+      
+      // Store the user data and token
+      setUser(mockUser);
+      localStorage.setItem('user', JSON.stringify(mockUser));
+      localStorage.setItem('token', mockUser.token);
+      
+      return mockUser;
+    } catch (error) {
+      setError('Apple login failed. Please try again.');
+      console.error('Apple login error:', error);
+      return null;
     } finally {
       setIsLoading(false);
     }

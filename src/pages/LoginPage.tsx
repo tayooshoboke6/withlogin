@@ -225,6 +225,7 @@ const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { login, loginWithGoogle, loginWithApple, isAuthenticated, isLoading, error, clearError } = useAuth();
   
   const navigate = useNavigate();
@@ -258,19 +259,33 @@ const LoginPage: React.FC = () => {
   
   // Handle Google login
   const handleGoogleLogin = async () => {
+    setIsSubmitting(true);
     try {
-      await loginWithGoogle();
-    } catch (err) {
-      // Error will be handled by the AuthContext
+      const user = await loginWithGoogle();
+      if (user) {
+        const destination = location.state?.from?.pathname || '/';
+        navigate(destination);
+      }
+    } catch (error) {
+      console.error('Google login error:', error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
   
   // Handle Apple login
   const handleAppleLogin = async () => {
+    setIsSubmitting(true);
     try {
-      await loginWithApple();
-    } catch (err) {
-      // Error will be handled by the AuthContext
+      const user = await loginWithApple();
+      if (user) {
+        const destination = location.state?.from?.pathname || '/';
+        navigate(destination);
+      }
+    } catch (error) {
+      console.error('Apple login error:', error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
   
@@ -341,8 +356,8 @@ const LoginPage: React.FC = () => {
           <Link to="/forgot-password">Forgot Password?</Link>
         </ForgotPassword>
         
-        <Button type="submit" disabled={isLoading}>
-          {isLoading ? 'Logging in...' : 'Login'}
+        <Button type="submit" disabled={isLoading || isSubmitting}>
+          {isLoading || isSubmitting ? 'Logging in...' : 'Login'}
         </Button>
       </Form>
       

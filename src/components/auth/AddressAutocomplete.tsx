@@ -51,6 +51,12 @@ const SuggestionItem = styled.div`
 `;
 
 // This will be used to store the Google Maps Places Autocomplete service
+declare global {
+  interface Window {
+    google: any;
+  }
+}
+
 let autocompleteService: google.maps.places.AutocompleteService | null = null;
 
 const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({ 
@@ -65,11 +71,11 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
   // Initialize Google Maps Places Autocomplete service
   useEffect(() => {
     // Check if the Google Maps API script is already loaded
-    if (!window.google?.maps?.places && !document.getElementById('google-maps-script')) {
+    if (window.google?.maps?.places === undefined && !document.getElementById('google-maps-script')) {
       // If not, add the script to the document
       const script = document.createElement('script');
       script.id = 'google-maps-script';
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY || 'YOUR_GOOGLE_MAPS_API_KEY'}&libraries=places`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyA8uPmEdNIXnG7TXLMf2iECVp5wAmXczeY&libraries=places`;
       script.async = true;
       script.defer = true;
       

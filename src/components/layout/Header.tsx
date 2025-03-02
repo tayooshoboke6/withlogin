@@ -159,7 +159,7 @@ const CartCount = styled.div`
   font-weight: bold;
 `;
 
-const UserMenu = styled.div`
+const UserMenu = styled.div<{ $visible: boolean }>`
   position: absolute;
   top: 100%;
   right: 0;
@@ -169,7 +169,7 @@ const UserMenu = styled.div`
   padding: 10px 0;
   min-width: 180px;
   z-index: 10;
-  display: ${props => props.visible ? 'block' : 'none'};
+  display: ${props => props.$visible ? 'block' : 'none'};
 `;
 
 const UserMenuItem = styled.button`
@@ -241,7 +241,7 @@ const Header = () => {
           </ActionButton>
           
           {isAuthenticated && (
-            <UserMenu visible={showUserMenu}>
+            <UserMenu $visible={showUserMenu}>
               <UserMenuItem onClick={() => { setShowUserMenu(false); navigate('/profile'); }}>
                 My Profile
               </UserMenuItem>

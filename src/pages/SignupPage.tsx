@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import { useAuth } from '../contexts/AuthContext';
 import { RegisterData } from '../contexts/AuthContext';
@@ -255,10 +255,12 @@ const SignupPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formErrors, setFormErrors] = useState<{[key: string]: string}>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const { register, loginWithGoogle, loginWithApple, isAuthenticated, isLoading, error, clearError } = useAuth();
   
   const navigate = useNavigate();
+  const location = useLocation();
   
   // If already authenticated, redirect to home
   useEffect(() => {
@@ -327,19 +329,33 @@ const SignupPage: React.FC = () => {
   
   // Handle Google signup
   const handleGoogleSignup = async () => {
+    setIsSubmitting(true);
     try {
-      await loginWithGoogle();
-    } catch (err) {
-      // Error will be handled by the AuthContext
+      const user = await loginWithGoogle();
+      if (user) {
+        const destination = location.state?.from?.pathname || '/';
+        navigate(destination);
+      }
+    } catch (error) {
+      console.error('Google signup error:', error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
   
   // Handle Apple signup
   const handleAppleSignup = async () => {
+    setIsSubmitting(true);
     try {
-      await loginWithApple();
-    } catch (err) {
-      // Error will be handled by the AuthContext
+      const user = await loginWithApple();
+      if (user) {
+        const destination = location.state?.from?.pathname || '/';
+        navigate(destination);
+      }
+    } catch (error) {
+      console.error('Apple signup error:', error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
   
@@ -500,8 +516,8 @@ const SignupPage: React.FC = () => {
           {formErrors.confirmPassword && <ValidationMessage>{formErrors.confirmPassword}</ValidationMessage>}
         </FormGroup>
         
-        <Button type="submit" disabled={isLoading}>
-          {isLoading ? 'Creating account...' : 'Sign Up'}
+        <Button type="submit" disabled={isLoading || isSubmitting}>
+          {isLoading || isSubmitting ? 'Creating account...' : 'Sign Up'}
         </Button>
       </Form>
       
