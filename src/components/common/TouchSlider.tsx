@@ -91,7 +91,7 @@ const TouchSlider: React.FC<TouchSliderProps> = ({
   const sliderRef = useRef<HTMLDivElement>(null);
   
   // Minimum swipe distance required (in pixels)
-  const minSwipeDistance = 50;
+  const minSwipeDistance = 30; // Reduced from 50 for more responsive swiping
   const slideCount = React.Children.count(children);
   
   // Auto-rotate slides
@@ -186,7 +186,7 @@ const TouchSlider: React.FC<TouchSliderProps> = ({
     >
       <SliderTrack 
         style={{ transform: `translateX(${translateX}%)` }}
-        transition={isSwiping ? 'none' : 'transform 0.4s ease-in-out'}
+        transition={isSwiping ? 'none' : 'transform 0.25s ease-out'} // Faster and smoother transition
       >
         {React.Children.map(children, (child) => (
           <div style={{ minWidth: '100%', width: '100%', flexShrink: 0 }}>

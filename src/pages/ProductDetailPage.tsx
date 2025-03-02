@@ -148,7 +148,7 @@ const ProductsTrack = styled.div`
   display: flex;
   gap: 16px;
   overflow-x: hidden;
-  transition: transform 0.3s ease;
+  transition: transform 0.2s ease-out; /* Faster transition time and smoother easing */
 `;
 
 const ProductSlideCard = styled.div`
@@ -598,7 +598,7 @@ const ProductDetailPage = () => {
     if (!touchStart || !touchEnd) return;
     
     const distance = touchStart - touchEnd;
-    const minSwipeDistance = 50;
+    const minSwipeDistance = 30; // Reduced from 50 for more sensitive swiping
     
     if (distance > minSwipeDistance && currentFrequentlyBoughtIndex < maxFrequentlyBoughtIndex) {
       // Swipe left - go to next recommended products

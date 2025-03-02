@@ -28,7 +28,7 @@ const CategoriesCarousel = styled.div`
 
 const CategoriesTrack = styled.div`
   display: flex;
-  transition: transform 0.5s ease;
+  transition: transform 0.25s ease-out;
   gap: 15px;
   
   @media (max-width: 768px) {
@@ -232,7 +232,7 @@ const CategorySection: React.FC = () => {
     if (!touchStart || !touchEnd) return;
     
     const distance = touchStart - touchEnd;
-    const minSwipeDistance = 50;
+    const minSwipeDistance = 30;
     
     if (distance > minSwipeDistance && currentIndex < maxIndex) {
       // Swipe left - go to next category
@@ -242,7 +242,6 @@ const CategorySection: React.FC = () => {
       handlePrev();
     }
     
-    // Reset touch values
     setTouchStart(null);
     setTouchEnd(null);
   };
