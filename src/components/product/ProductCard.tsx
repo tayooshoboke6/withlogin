@@ -338,6 +338,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
       image,
       quantity: 1
     });
+    
+    // Navigate to product page after adding to cart
+    navigate(`/product/${id}`);
   };
   
   const renderStars = () => {

@@ -135,7 +135,7 @@ const AddToCartContainer = styled.div`
   }
 `;
 
-const SimilarProductsSection = styled.div`
+const FrequentlyBoughtTogetherSection = styled.div`
   margin-top: 40px;
 `;
 
@@ -558,7 +558,7 @@ const ProductDetailPage = () => {
   const { addToCart, buyNow, cartItems, updateQuantity, removeFromCart } = useCart();
   const navigate = useNavigate();
   const [_, setSelectedImage] = useState(0);
-  const [currentSimilarIndex, setCurrentSimilarIndex] = useState(0);
+  const [currentFrequentlyBoughtIndex, setCurrentFrequentlyBoughtIndex] = useState(0);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
 
@@ -571,45 +571,43 @@ const ProductDetailPage = () => {
   const product = mockProducts.find((p) => p.id.toString() === id) || mockProducts[0];
 
   // Get similar products (same category, excluding current product)
-  const similarProducts = mockProducts
-    .filter(item => item.id !== product.id && item.category === product.category)
+  const frequentlyBoughtProducts = mockProducts
+    .filter((p) => p.id !== product.id)
     .slice(0, 8); // Limit to 8 similar products
+  
+  const maxFrequentlyBoughtIndex = Math.max(0, frequentlyBoughtProducts.length - 4);
 
-  const maxSimilarIndex = Math.max(0, similarProducts.length - 4);
-
-  const handlePrevSimilar = () => {
-    setCurrentSimilarIndex(prev => Math.max(0, prev - 1));
+  const handlePrevFrequentlyBought = () => {
+    setCurrentFrequentlyBoughtIndex(prev => Math.max(0, prev - 1));
   };
-
-  const handleNextSimilar = () => {
-    setCurrentSimilarIndex(prev => Math.min(maxSimilarIndex, prev + 1));
+  
+  const handleNextFrequentlyBought = () => {
+    setCurrentFrequentlyBoughtIndex(prev => Math.min(maxFrequentlyBoughtIndex, prev + 1));
   };
 
   // Touch handlers for swipe functionality
-  const onTouchStart = (e: ReactTouchEvent<HTMLDivElement>) => {
+  const handleTouchStart = (e: ReactTouchEvent<HTMLDivElement>) => {
     setTouchStart(e.targetTouches[0].clientX);
   };
 
-  const onTouchMove = (e: ReactTouchEvent<HTMLDivElement>) => {
-    if (!touchStart) return;
+  const handleTouchMove = (e: ReactTouchEvent<HTMLDivElement>) => {
     setTouchEnd(e.targetTouches[0].clientX);
   };
 
-  const onTouchEnd = () => {
+  const handleTouchEnd = () => {
     if (!touchStart || !touchEnd) return;
-
+    
     const distance = touchStart - touchEnd;
     const minSwipeDistance = 50;
-
-    if (distance > minSwipeDistance && currentSimilarIndex < maxSimilarIndex) {
-      // Swipe left - go to next similar products
-      handleNextSimilar();
-    } else if (distance < -minSwipeDistance && currentSimilarIndex > 0) {
-      // Swipe right - go to previous similar products
-      handlePrevSimilar();
+    
+    if (distance > minSwipeDistance && currentFrequentlyBoughtIndex < maxFrequentlyBoughtIndex) {
+      // Swipe left - go to next recommended products
+      handleNextFrequentlyBought();
+    } else if (distance < -minSwipeDistance && currentFrequentlyBoughtIndex > 0) {
+      // Swipe right - go to previous recommended products
+      handlePrevFrequentlyBought();
     }
-
-    // Reset touch values
+    
     setTouchStart(null);
     setTouchEnd(null);
   };
@@ -697,7 +695,7 @@ const ProductDetailPage = () => {
     if (halfStar) {
       stars.push(
         <svg key="star-half" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#FFD700" viewBox="0 0 16 16">
-          <path d="M5.354 5.119 7.538.792A.516.516 0 0 1 8 .5c.183 0 .366.097.465.292l2.184 4.327 4.898.696A.537.537 0 0 1 16 6.32a.548.548 0 0 1-.17.445l-3.523 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256a.52.52 0 0 1-.146.05c-.342.06-.668-.254-.6-.642l.83-4.73L.173 6.765a.55.55 0 0 1-.172-.403.58.58 0 0 1 .085-.302.513.513 0 0 1 .37-.245l4.898-.696zM8 12.027a.5.5 0 0 1 .232.056l3.686 1.894-.694-3.957a.565.565 0 0 1 .162-.505l2.907-2.77-4.052-.575a.525.525 0 0 1-.393-.288L8.001 2.226 8 2.226v9.8z"/>
+          <path d="M5.354 5.119 7.538.792A.516.516 0 0 1 8 .5c.183 0 .366.097.465.292l2.184 4.327 4.898.696A.537.537 0 0 1 16 6.32a.548.548 0 0 1-.17.445l-3.523 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256a.52.52 0 0 1-.146.05c-.342.06-.668-.254-.6-.642l.83-4.73L.173 6.765a.55.55 0 0 1-.172-.403.58.58 0 0 1 .085-.302.513.513 0 0 1 .37-.245l4.898-.696zM8 12.027a.5.5 0 0 1 .232.056l3.686 1.894-.694-3.957a.565.565 0 0 1 .162-.506l2.907-2.77-4.052-.575a.525.525 0 0 1-.393-.288L8.001 2.226 8 2.226v9.8z"/>
         </svg>
       );
     }
@@ -807,17 +805,17 @@ const ProductDetailPage = () => {
             </ProductInfo>
           </ProductGrid>
 
-          {/* Similar Products Section */}
-          <SimilarProductsSection>
-            <Text size="xl" weight="bold" style={{ marginBottom: '20px' }}>Similar Products</Text>
+          {/* Frequently Bought Together Section */}
+          <FrequentlyBoughtTogetherSection>
+            <Text size="xl" weight="bold" style={{ marginBottom: '20px' }}>Frequently Bought Together</Text>
 
-            {similarProducts.length > 0 ? (
+            {frequentlyBoughtProducts.length > 0 ? (
               <ProductsCarousel>
                 <NavButton 
                   direction="left" 
-                  onClick={handlePrevSimilar}
-                  disabled={currentSimilarIndex === 0}
-                  style={{ opacity: currentSimilarIndex === 0 ? 0.5 : 1 }}
+                  onClick={handlePrevFrequentlyBought}
+                  disabled={currentFrequentlyBoughtIndex === 0}
+                  style={{ opacity: currentFrequentlyBoughtIndex === 0 ? 0.5 : 1 }}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                     <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
@@ -825,12 +823,12 @@ const ProductDetailPage = () => {
                 </NavButton>
 
                 <ProductsTrack 
-                  style={{ transform: `translateX(-${currentSimilarIndex * 25}%)` }}
-                  onTouchStart={onTouchStart}
-                  onTouchMove={onTouchMove}
-                  onTouchEnd={onTouchEnd}
+                  style={{ transform: `translateX(-${currentFrequentlyBoughtIndex * 25}%)` }}
+                  onTouchStart={handleTouchStart}
+                  onTouchMove={handleTouchMove}
+                  onTouchEnd={handleTouchEnd}
                 >
-                  {similarProducts.map(similarProduct => (
+                  {frequentlyBoughtProducts.map(similarProduct => (
                     <ProductSlideCard key={similarProduct.id}>
                       <ProductCard>
                         <CardImage>
@@ -855,9 +853,9 @@ const ProductDetailPage = () => {
 
                 <NavButton 
                   direction="right" 
-                  onClick={handleNextSimilar}
-                  disabled={currentSimilarIndex === maxSimilarIndex}
-                  style={{ opacity: currentSimilarIndex === maxSimilarIndex ? 0.5 : 1 }}
+                  onClick={handleNextFrequentlyBought}
+                  disabled={currentFrequentlyBoughtIndex === maxFrequentlyBoughtIndex}
+                  style={{ opacity: currentFrequentlyBoughtIndex === maxFrequentlyBoughtIndex ? 0.5 : 1 }}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                     <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
@@ -865,9 +863,9 @@ const ProductDetailPage = () => {
                 </NavButton>
               </ProductsCarousel>
             ) : (
-              <div>No similar products found</div>
+              <div>No recommended products found</div>
             )}
-          </SimilarProductsSection>
+          </FrequentlyBoughtTogetherSection>
         </SectionContainer>
       </MainContent>
 

@@ -659,6 +659,9 @@ const CategoryProductsPage: React.FC = () => {
         image: product.image,
         quantity: 1
       });
+      
+      // Navigate to product page after adding to cart
+      navigate(`/product/${product.id}`);
     }
   };
   
