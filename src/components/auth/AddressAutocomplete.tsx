@@ -51,12 +51,6 @@ const SuggestionItem = styled.div`
 `;
 
 // This will be used to store the Google Maps Places Autocomplete service
-declare global {
-  interface Window {
-    google: any;
-  }
-}
-
 let autocompleteService: google.maps.places.AutocompleteService | null = null;
 
 const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({ 

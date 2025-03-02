@@ -38,5 +38,5 @@ declare namespace google {
 
 // Extend Window interface to include google property
 interface Window {
-  google?: typeof google;
+  google: typeof google;
 }

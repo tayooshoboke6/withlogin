@@ -3,12 +3,13 @@ import axios from 'axios';
 
 // Define types for our authentication context
 interface User {
-  id: number;
+  id: string | number;
   email: string;
   firstName: string;
   lastName: string;
   address?: string;
   gender?: 'male' | 'female' | 'other';
+  token?: string;
   // Add other user properties as needed
 }
 
@@ -94,16 +95,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     
     try {
       // TODO: Replace with actual API endpoint when backend is ready
+      // In a real implementation, we would pass the password to the API:
       // const response = await axios.post('/api/login', { email, password });
       // const { token, user: userData } = response.data;
       
-      // Mock successful login
+      // Mock successful login - in a real app, the password would be validated server-side
+      console.log(`Logging in with email: ${email} and password: ${password.replace(/./g, '*')}`);
+      
       const token = 'mock_token_' + Math.random().toString(36).substring(2);
       const userData = {
         id: 1,
         email,
         firstName: 'John',
-        lastName: 'Doe'
+        lastName: 'Doe',
+        token: token
       };
       
       // Store token in localStorage
