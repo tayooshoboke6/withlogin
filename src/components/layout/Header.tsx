@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../../contexts/CartContext';
+import { useAuth } from '../../contexts/AuthContext';
 
 const HeaderContainer = styled.header`
   background-color: #0066b2;
@@ -158,10 +159,56 @@ const CartCount = styled.div`
   font-weight: bold;
 `;
 
+const UserMenu = styled.div`
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  padding: 10px 0;
+  min-width: 180px;
+  z-index: 10;
+  display: ${props => props.visible ? 'block' : 'none'};
+`;
+
+const UserMenuItem = styled.button`
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 8px 15px;
+  background: none;
+  border: none;
+  color: #333;
+  cursor: pointer;
+  font-size: 14px;
+  
+  &:hover {
+    background-color: #f5f5f5;
+  }
+`;
+
 const Header = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [showUserMenu, setShowUserMenu] = useState(false);
   const { getCartCount } = useCart();
+  const { user, isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
   const cartCount = getCartCount();
+
+  const handleAccountClick = () => {
+    if (isAuthenticated) {
+      setShowUserMenu(!showUserMenu);
+    } else {
+      navigate('/login');
+    }
+  };
+
+  const handleLogout = () => {
+    logout();
+    setShowUserMenu(false);
+    navigate('/');
+  };
 
   return (
     <HeaderContainer>
@@ -185,12 +232,33 @@ const Header = () => {
       </SearchBar>
       
       <HeaderActions>
-        <ActionButton>
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-person" viewBox="0 0 16 16">
-            <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0m4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10s-3.516.68-4.168 1.332c-.678.678-.83 1.418-.832 1.664z"/>
-          </svg>
-          <span>Account</span>
-        </ActionButton>
+        <div style={{ position: 'relative' }}>
+          <ActionButton onClick={handleAccountClick}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-person" viewBox="0 0 16 16">
+              <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0m4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10s-3.516.68-4.168 1.332c-.678.678-.83 1.418-.832 1.664z"/>
+            </svg>
+            <span>{isAuthenticated ? user?.firstName || 'Account' : 'Login'}</span>
+          </ActionButton>
+          
+          {isAuthenticated && (
+            <UserMenu visible={showUserMenu}>
+              <UserMenuItem onClick={() => { setShowUserMenu(false); navigate('/profile'); }}>
+                My Profile
+              </UserMenuItem>
+              <UserMenuItem onClick={() => { setShowUserMenu(false); navigate('/orders'); }}>
+                My Orders
+              </UserMenuItem>
+              {user?.email === 'admin@mmartplus.com' && (
+                <UserMenuItem onClick={() => { setShowUserMenu(false); navigate('/admin'); }}>
+                  Admin Dashboard
+                </UserMenuItem>
+              )}
+              <UserMenuItem onClick={handleLogout}>
+                Logout
+              </UserMenuItem>
+            </UserMenu>
+          )}
+        </div>
         
         <ActionButton>
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-question-circle" viewBox="0 0 16 16">

@@ -3,7 +3,11 @@ import HomePage from './pages/HomePage'
 import ProductDetailPage from './pages/ProductDetailPage'
 import CartPage from './pages/CartPage'
 import CategoryProductsPage from './pages/CategoryProductsPage'
+import LoginPage from './pages/LoginPage'
+import SignupPage from './pages/SignupPage'
 import { CartProvider } from './contexts/CartContext'
+import { AuthProvider } from './contexts/AuthContext'
+import ProtectedRoute from './components/auth/ProtectedRoute'
 import './App.css'
 
 // Admin pages
@@ -18,25 +22,31 @@ import UsersPage from './pages/admin/UsersPage'
 function App() {
   return (
     <Router>
-      <CartProvider>
-        <Routes>
-          {/* Customer routes */}
-          <Route path="/" element={<HomePage />} />
-          <Route path="/product/:id" element={<ProductDetailPage />} />
-          <Route path="/cart" element={<CartPage />} />
-          <Route path="/category/:slug" element={<CategoryProductsPage />} />
-          
-          {/* Admin routes */}
-          <Route path="/admin" element={<DashboardPage />} />
-          <Route path="/admin/products" element={<ProductsPage />} />
-          <Route path="/admin/products/new" element={<ProductFormPage />} />
-          <Route path="/admin/products/edit/:id" element={<ProductFormPage />} />
-          <Route path="/admin/categories" element={<CategoriesPage />} />
-          <Route path="/admin/orders" element={<OrdersPage />} />
-          <Route path="/admin/users" element={<UsersPage />} />
-          <Route path="/admin/settings" element={<SettingsPage />} />
-        </Routes>
-      </CartProvider>
+      <AuthProvider>
+        <CartProvider>
+          <Routes>
+            {/* Auth routes */}
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignupPage />} />
+            
+            {/* Customer routes */}
+            <Route path="/" element={<HomePage />} />
+            <Route path="/product/:id" element={<ProductDetailPage />} />
+            <Route path="/cart" element={<CartPage />} />
+            <Route path="/category/:slug" element={<CategoryProductsPage />} />
+            
+            {/* Protected Admin routes */}
+            <Route path="/admin" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+            <Route path="/admin/products" element={<ProtectedRoute><ProductsPage /></ProtectedRoute>} />
+            <Route path="/admin/products/new" element={<ProtectedRoute><ProductFormPage /></ProtectedRoute>} />
+            <Route path="/admin/products/edit/:id" element={<ProtectedRoute><ProductFormPage /></ProtectedRoute>} />
+            <Route path="/admin/categories" element={<ProtectedRoute><CategoriesPage /></ProtectedRoute>} />
+            <Route path="/admin/orders" element={<ProtectedRoute><OrdersPage /></ProtectedRoute>} />
+            <Route path="/admin/users" element={<ProtectedRoute><UsersPage /></ProtectedRoute>} />
+            <Route path="/admin/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
+          </Routes>
+        </CartProvider>
+      </AuthProvider>
     </Router>
   )
 }
